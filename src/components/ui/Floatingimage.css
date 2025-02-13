@@ -1,0 +1,49 @@
+.floating-image-container {
+    display: flex;
+    position: absolute;
+    top: 0;
+    height: 600px; /* Adjust container height as needed */
+    overflow: hidden; /* Optional: Prevent the image from going out of bounds */
+    left: -80px;
+    width: 100%;
+    z-index: 10;
+  }
+  
+  .floating-image {
+    width: 500px; /* Adjust the size of the image as needed */
+    height: auto;
+    animation: floatEffect 4s infinite ease-in-out; /* Updated animation name */
+  }
+  
+  @keyframes floatEffect {
+    0% {
+      transform: translateY(0px); /* Start position */
+    }
+    50% {
+      transform: translateY(-30px); /* Float up */
+    }
+    100% {
+      transform: translateY(0px); /* Float back down */
+    }
+  }
+  
+  /* Responsive Styling for Smaller Screens */
+  @media (max-width: 600px) {
+    .floating-image-container {
+      display: flex;
+      position: absolute;
+      top: 30px;
+      justify-content: center;
+      align-items: center;
+      height: 400px; /* Adjust container height as needed */
+      left: 0;
+      width: 100%;
+    }
+  
+    .floating-image {
+      width: 300px; /* Adjust the size of the image as needed */
+      height: auto;
+      animation: floatEffect 4s infinite ease-in-out;
+    }
+  }
+  

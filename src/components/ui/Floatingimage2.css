@@ -1,0 +1,47 @@
+.floating-image-container2 {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    overflow: hidden; /* Optional: Prevent the image from going out of bounds */
+    right: 0;
+    
+    z-index: 1;
+  }
+  
+  .floating-image2 {
+    width: 200px; /* Adjust the size of the image as needed */
+    /* animation: floatEffect3 4s infinite ease-in-out;  */
+    cursor: pointer;
+  }
+  
+  @keyframes floatEffect3 {
+    0% {
+      transform: translateY(-30px); /* Start position */
+    }
+    50% {
+      transform: translateY(0px); /* Float up */
+    }
+    100% {
+      transform: translateY(-30px); /* Float back down */
+    }
+  }
+  
+  /* Responsive Styling for Smaller Screens */
+  @media (max-width: 600px) {
+    .floating-image-container2 {
+      display: flex;
+      position: absolute;
+bottom: -100px;
+      justify-content: center;
+      align-items: center;
+      height: 400px; /* Adjust container height as needed */
+      bottom: 20px;
+
+    }
+  
+    .floating-image2 {
+      width: 150px; /* Adjust the size of the image as needed */
+      /* animation: floatEffect3 4s infinite ease-in-out; */
+    }
+  }
+  
