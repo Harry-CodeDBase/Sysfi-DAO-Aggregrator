@@ -3,9 +3,9 @@ import React, { useState, useEffect } from "react";
 const Type = () => {
   const texts = [
     "Welcome to Sysfi",
-    "Run your DAO",
+    "Run your DAO in 60sec",
     "Explore DeFi",
-    "Own Community",
+    "Own a Community",
   ];
 
   const typingSpeed = 100; // Speed of typing each character

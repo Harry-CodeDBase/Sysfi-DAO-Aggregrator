@@ -2,19 +2,24 @@
   {
     "inputs": [
       {
-        "internalType": "contract Token",
+        "internalType": "contract IERC20",
         "name": "_token",
         "type": "address"
       },
       {
-        "internalType": "contract Treasury",
-        "name": "_treasury",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "_quorum",
+        "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "_delegationLogic",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "_votingPeriodHours",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
       }
     ],
     "stateMutability": "nonpayable",
@@ -24,26 +29,31 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
-        "name": "executor",
+        "name": "delegator",
         "type": "address"
-      }
-    ],
-    "name": "ExecutorApproved",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "delegatee",
+        "type": "address"
+      },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "executor",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       }
     ],
-    "name": "ExecutorRevoked",
+    "name": "Delegate",
     "type": "event"
   },
   {
@@ -57,27 +67,47 @@
       },
       {
         "indexed": false,
-        "internalType": "enum DAOCore.ProposalType",
-        "name": "proposalType",
-        "type": "uint8"
-      },
+        "internalType": "address",
+        "name": "investor",
+        "type": "address"
+      }
+    ],
+    "name": "DownVote",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "title",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "description",
-        "type": "string"
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "creator",
+        "name": "recipient",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum DelegatedDAO.ProposalStatus",
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "name": "Finalize",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -90,158 +120,81 @@
         "internalType": "address",
         "name": "recipient",
         "type": "address"
-      }
-    ],
-    "name": "ProposalCreated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "enum DAOCore.ProposalStatus",
-        "name": "status",
-        "type": "uint8"
-      }
-    ],
-    "name": "ProposalFinalized",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "newThreshold",
-        "type": "uint256"
-      }
-    ],
-    "name": "ProposalThresholdUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "newTreasury",
-        "type": "address"
-      }
-    ],
-    "name": "TreasuryAddressUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "voter",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "int256",
-        "name": "weight",
-        "type": "int256"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "support",
-        "type": "bool"
-      }
-    ],
-    "name": "Voted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "voter",
+        "name": "creator",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "string",
-        "name": "tag",
+        "name": "description",
         "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isFunding",
+        "type": "bool"
       }
     ],
-    "name": "VoterTagged",
+    "name": "Propose",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "delegator",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "delegatee",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "Undelegate",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "investor",
+        "type": "address"
+      }
+    ],
+    "name": "UpVote",
     "type": "event"
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_id",
-        "type": "uint256"
-      }
-    ],
-    "name": "activateProposal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_executor",
-        "type": "address"
-      }
-    ],
-    "name": "approveExecutor",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "approvedExecutors",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "enum DAOCore.ProposalType",
-        "name": "_proposalType",
-        "type": "uint8"
-      },
       {
         "internalType": "string",
         "name": "_title",
@@ -261,6 +214,11 @@
         "internalType": "address payable",
         "name": "_recipient",
         "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isFunding",
+        "type": "bool"
       }
     ],
     "name": "createProposal",
@@ -269,16 +227,153 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "delegationLogic",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_delegatee",
+        "type": "address"
+      }
+    ],
+    "name": "delegate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "delegateeDelegatorCount",
     "outputs": [
       {
-        "internalType": "contract DelegationLogic",
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "delegateeDelegatorIndex",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "delegateeDelegators",
+    "outputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "delegateeVotesReceived",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "delegatorBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "delegatorDelegatee",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "downVote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -295,58 +390,12 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_id",
-        "type": "uint256"
-      }
-    ],
-    "name": "getProposal",
+    "inputs": [],
+    "name": "getVotersHeadcount",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum DAOCore.ProposalType",
-        "name": "proposalType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "string",
-        "name": "title",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "description",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address payable",
-        "name": "recipient",
-        "type": "address"
-      },
-      {
-        "internalType": "int256",
-        "name": "votes",
-        "type": "int256"
-      },
-      {
-        "internalType": "enum DAOCore.ProposalStatus",
-        "name": "status",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "createdAt",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -354,19 +403,13 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_id",
-        "type": "uint256"
-      }
-    ],
-    "name": "getProposalType",
+    "inputs": [],
+    "name": "getVotersList",
     "outputs": [
       {
-        "internalType": "enum DAOCore.ProposalType",
+        "internalType": "address[]",
         "name": "",
-        "type": "uint8"
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -376,11 +419,48 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "voter",
+        "name": "",
         "type": "address"
       }
     ],
-    "name": "getVoterTag",
+    "name": "hasVotedAtLeastOnce",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "hasVotedIndependently",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "name",
     "outputs": [
       {
         "internalType": "string",
@@ -418,19 +498,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "proposalThreshold",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -444,11 +511,6 @@
         "internalType": "uint256",
         "name": "id",
         "type": "uint256"
-      },
-      {
-        "internalType": "enum DAOCore.ProposalType",
-        "name": "proposalType",
-        "type": "uint8"
       },
       {
         "internalType": "string",
@@ -471,31 +533,28 @@
         "type": "address"
       },
       {
-        "internalType": "int256",
-        "name": "votes",
-        "type": "int256"
+        "internalType": "bool",
+        "name": "isFunding",
+        "type": "bool"
       },
       {
-        "internalType": "enum DAOCore.ProposalStatus",
+        "internalType": "uint256",
+        "name": "upVotes",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "downVotes",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum DelegatedDAO.ProposalStatus",
         "name": "status",
         "type": "uint8"
       },
       {
         "internalType": "uint256",
-        "name": "createdAt",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "quorumPercentage",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
+        "name": "timestamp",
         "type": "uint256"
       }
     ],
@@ -506,13 +565,32 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_executor",
+        "name": "",
         "type": "address"
       }
     ],
-    "name": "revokeExecutor",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "proposalsVotedCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "quorum",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -520,7 +598,7 @@
     "name": "token",
     "outputs": [
       {
-        "internalType": "contract Token",
+        "internalType": "contract IERC20",
         "name": "",
         "type": "address"
       }
@@ -530,39 +608,20 @@
   },
   {
     "inputs": [],
-    "name": "treasury",
+    "name": "totalTokensDelegated",
     "outputs": [
       {
-        "internalType": "contract Treasury",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "newThreshold",
-        "type": "uint256"
-      }
-    ],
-    "name": "updateProposalThreshold",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract Treasury",
-        "name": "newTreasury",
-        "type": "address"
-      }
-    ],
-    "name": "updateTreasuryAddress",
+    "inputs": [],
+    "name": "undelegate",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -573,14 +632,9 @@
         "internalType": "uint256",
         "name": "_id",
         "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "_support",
-        "type": "bool"
       }
     ],
-    "name": "vote",
+    "name": "upVote",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -588,17 +642,17 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "voterCounts",
-    "outputs": [
-      {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "name": "votersList",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -610,35 +664,27 @@
         "internalType": "address",
         "name": "",
         "type": "address"
-      }
-    ],
-    "name": "voterTags",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "votingDelayDays",
-    "outputs": [
+      },
       {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
     ],
+    "name": "votesCast",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "votingPeriodDays",
+    "name": "votingPeriodHours",
     "outputs": [
       {
         "internalType": "uint256",

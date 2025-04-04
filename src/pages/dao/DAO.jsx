@@ -33,21 +33,23 @@ function History() {
 }
 
 function Delegate() {
-  return <div className="p-4">Delegate Content</div>;
+  return <div className="p-4">Delegate function coming soon</div>;
 }
 
 export default function DAO() {
   const [activeTab, setActiveTab] = useState(tabs[0].name);
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-gray-950 p-4 rounded-lg shadow-md">
+    <div className="w-full  mx-auto  p-2 rounded-lg shadow-md">
       <VotingInfo />
-      <div className="flex border-b border-teal-500">
+
+      <br />
+      <div className="flex border-b border-teal-500 ">
         {tabs.map((tab) => (
           <button
             key={tab.name}
             onClick={() => setActiveTab(tab.name)}
-            className={`flex-1 p-2 text-white border-b-2 transition-all duration-300 ${
+            className={`flex-1 p-2 text-white border-b-2 bg-black transition-all duration-300 ${
               activeTab === tab.name
                 ? "border-teal-500 font-semibold"
                 : "border-transparent"

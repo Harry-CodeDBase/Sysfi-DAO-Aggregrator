@@ -21,13 +21,12 @@ const firebaseConfig = {
   measurementId: "G-J4HNBX6W1Y",
 };
 
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app); // Initialize Firestore and other services as needed
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
-const storage = getStorage(app)
+const storage = getStorage(app);
 
-export { db, auth,googleProvider, storage};
+export { db, auth, googleProvider, storage };
 const analytics = getAnalytics(app);

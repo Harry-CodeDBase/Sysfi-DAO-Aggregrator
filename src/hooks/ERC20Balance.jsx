@@ -21,7 +21,7 @@ function Balance() {
 
   return (
     <div>
-      {isConnected ? <p>Bal: {formattedBalance} SYN</p> : <p>Not Connected</p>}
+      {isConnected ? <p>{formattedBalance} SYN</p> : <p>Not Connected</p>}
     </div>
   );
 }

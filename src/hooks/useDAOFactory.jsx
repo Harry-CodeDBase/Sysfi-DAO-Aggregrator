@@ -8,12 +8,6 @@ export function useDAOFactory() {
   const [isDataReady, setIsDataReady] = useState(false);
 
   // Read contract data
-  const { data: nativeFee, isSuccess: isNativeFeeSuccess } = useReadContract({
-    address: daoFactoryConfig.address,
-    abi: daoFactoryConfig.abi,
-    functionName: "nativeDaoCreationFee",
-  });
-
   const { data: tokenFee, isSuccess: isTokenFeeSuccess } = useReadContract({
     address: daoFactoryConfig.address,
     abi: daoFactoryConfig.abi,
@@ -37,17 +31,9 @@ export function useDAOFactory() {
   // When all data is loaded, mark the hook as ready
   useEffect(() => {
     setIsDataReady(
-      isNativeFeeSuccess &&
-        isTokenFeeSuccess &&
-        isFeeTokenAddressSuccess &&
-        isDeployedDAOsSuccess
+      isTokenFeeSuccess && isFeeTokenAddressSuccess && isDeployedDAOsSuccess
     );
-  }, [
-    isNativeFeeSuccess,
-    isTokenFeeSuccess,
-    isFeeTokenAddressSuccess,
-    isDeployedDAOsSuccess,
-  ]);
+  }, [isTokenFeeSuccess, isFeeTokenAddressSuccess, isDeployedDAOsSuccess]);
 
   // Approve contract write hook
   const {
@@ -94,26 +80,15 @@ export function useDAOFactory() {
     daoName,
   }) => {
     if (!isDataReady) throw new Error("Data is not ready yet.");
+    if (!tokenFee) throw new Error("Token DAO fee not loaded yet.");
     setCreating(true);
 
     try {
-      const overrides = {};
-      if (
-        !tokenAddress ||
-        tokenAddress === "0x0000000000000000000000000000000000000000"
-      ) {
-        if (!nativeFee) throw new Error("Native fee not loaded yet.");
-        overrides.value = nativeFee;
-      } else if (!tokenFee) {
-        throw new Error("Token DAO fee not loaded yet.");
-      }
-
       return await createDAOWrite({
         address: daoFactoryConfig.address,
         abi: daoFactoryConfig.abi,
         functionName: "createDAO",
         args: [quorum, votingPeriodHours, tokenAddress, genre, daoName],
-        overrides,
       });
     } catch (err) {
       console.error("Error creating DAO:", err);
@@ -125,7 +100,6 @@ export function useDAOFactory() {
 
   return {
     isConnected,
-    nativeFee,
     tokenFee,
     feeTokenAddress,
     deployedDAOs,

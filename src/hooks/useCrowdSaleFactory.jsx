@@ -1,23 +1,41 @@
-import { useAccount, useContractWrite } from "wagmi";
+import {
+  useAccount,
+  useContractWrite,
+  useEstimateMaxPriorityFeePerGas,
+  useBlock,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import { parseUnits, parseEther } from "viem";
 import { CreateCrowdsaleConfig } from "./Contract";
+import { useState, useEffect } from "react";
 
 export default function useCreateCrowdsale() {
   const { address } = useAccount();
-  const { writeContractAsync, isLoading, error, data } = useContractWrite();
+  const [crowdsaleAddress, setCrowdsaleAddress] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [txHash, setTxHash] = useState(null); // Track transaction hash
+  const { writeContractAsync, error } = useContractWrite();
+  const { data: priorityFee } = useEstimateMaxPriorityFeePerGas();
+  const { data: block } = useBlock(); // Fetch the latest block
 
-  /**
-   * Creates a crowdsale by calling the createCrowdsale function on the contract.
-   *
-   * @param {Object} params
-   * @param {string} params.token - The token address.
-   * @param {number} params.startTime - The start time (in seconds).
-   * @param {number} params.endTime - The end time (in seconds).
-   * @param {string|number} params.tokensForSale - The number of tokens for sale.
-   * @param {BigInt} params.rate - The rate (tokens per ETH) as a BigInt.
-   * @param {BigInt} params.softCap - The soft cap (in wei) as a BigInt.
-   * @param {BigInt} params.hardCap - The hard cap (in wei) as a BigInt.
-   */
+  // Fetch transaction receipt when txHash is available
+  const { data: receipt, isLoading: receiptLoading } =
+    useWaitForTransactionReceipt({
+      hash: txHash,
+    });
+
+  // Extract deployed crowdsale address from receipt
+  useEffect(() => {
+    if (receipt) {
+      const newCrowdsaleAddress = receipt?.logs[0]?.address;
+      if (newCrowdsaleAddress) {
+        setCrowdsaleAddress(newCrowdsaleAddress);
+        console.log(crowdsaleAddress);
+      }
+    }
+  }, [receipt]);
+
+  // Function to create crowdsale
   const createCrowdsale = async ({
     token,
     startTime,
@@ -28,10 +46,10 @@ export default function useCreateCrowdsale() {
     hardCap,
   }) => {
     try {
-      // Convert tokensForSale assuming the token uses 18 decimals.
+      setLoading(true);
+
       const parsedTokensForSale = parseUnits(tokensForSale.toString(), 18);
 
-      // Make the contract call including the overrides to pass 10 ETH.
       const txResponse = await writeContractAsync({
         address: CreateCrowdsaleConfig.address,
         abi: CreateCrowdsaleConfig.abi,
@@ -46,15 +64,22 @@ export default function useCreateCrowdsale() {
           hardCap,
         ],
         account: address,
-        // This override sends 10 ETH along with the transaction.
-        overrides: { value: parseEther("0.01") },
+        value: parseEther("1"),
       });
 
-      console.log("Token launch transaction sent!", txResponse);
+      console.log("Transaction sent!", txResponse);
+      setTxHash(txResponse.hash); // Store the transaction hash
     } catch (error) {
-      console.error("Error launching token:", error);
+      console.error("Error launching crowdsale:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { createCrowdsale, isLoading, error, data };
+  return {
+    createCrowdsale,
+    crowdsaleAddress,
+    isLoading: loading || receiptLoading,
+    error,
+  };
 }

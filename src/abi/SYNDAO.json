@@ -7,6 +7,11 @@
         "type": "address"
       },
       {
+        "internalType": "address",
+        "name": "_nftContract",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_votingPeriodDays",
         "type": "uint256"
@@ -418,6 +423,19 @@
   },
   {
     "inputs": [],
+    "name": "nftContract",
+    "outputs": [
+      {
+        "internalType": "contract IERC721",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "owner",
     "outputs": [
       {
@@ -526,6 +544,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "rewardAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -593,6 +624,19 @@
       }
     ],
     "name": "upVote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newReward",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateRewardAmount",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -3,17 +3,17 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_nativeDaoCreationFee",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
         "name": "_tokenDaoCreationFee",
         "type": "uint256"
       },
       {
         "internalType": "address",
         "name": "_feeToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_feeCollector",
         "type": "address"
       }
     ],
@@ -52,6 +52,45 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newFeeCollector",
+        "type": "address"
+      }
+    ],
+    "name": "FeeCollectorUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newFeeToken",
+        "type": "address"
+      }
+    ],
+    "name": "FeeTokenUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "FeeUpdated",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -87,7 +126,7 @@
         "type": "address"
       }
     ],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -109,6 +148,24 @@
         "internalType": "enum DAOFactory.Genre",
         "name": "genre",
         "type": "uint8"
+      },
+      {
+        "internalType": "string",
+        "name": "daoName",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeCollector",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -142,6 +199,11 @@
             "internalType": "enum DAOFactory.Genre",
             "name": "genre",
             "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "daoName",
+            "type": "string"
           }
         ],
         "internalType": "struct DAOFactory.DAOInfo[]",
@@ -154,7 +216,7 @@
   },
   {
     "inputs": [],
-    "name": "nativeDaoCreationFee",
+    "name": "getTotalDAOs",
     "outputs": [
       {
         "internalType": "uint256",
@@ -179,45 +241,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_feeToken",
-        "type": "address"
-      }
-    ],
-    "name": "setFeeToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "newFee",
-        "type": "uint256"
-      }
-    ],
-    "name": "setNativeDaoCreationFee",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "newFee",
-        "type": "uint256"
-      }
-    ],
-    "name": "setTokenDaoCreationFee",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "tokenDaoCreationFee",
     "outputs": [
@@ -228,6 +251,45 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_newFeeCollector",
+        "type": "address"
+      }
+    ],
+    "name": "updateFeeCollector",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_newFeeToken",
+        "type": "address"
+      }
+    ],
+    "name": "updateFeeToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

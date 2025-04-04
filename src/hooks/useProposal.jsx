@@ -30,9 +30,8 @@ function useProposals() {
             address: synDAOConfig.address,
             abi: synDAOConfig.abi,
             functionName: "proposals",
-            args: [i+1],
+            args: [i + 1],
           });
-
 
           // Map the array to structured proposal fields
           fetchedProposals.push({

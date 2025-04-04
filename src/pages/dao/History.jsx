@@ -88,11 +88,8 @@ function HistoryList() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4">
+    <div className="min-h-screen p-1">
       <div className="container mx-auto">
-        <div className="flex justify-end mb-4">
-          <ConnectButton />
-        </div>
         <h2 className="text-3xl font-bold text-teal-400 mb-4">
           Finalized Proposals
         </h2>
@@ -103,7 +100,7 @@ function HistoryList() {
             onClick={() => setActiveTab("funding")}
             className={`px-4 py-2 rounded-t-lg font-medium ${
               activeTab === "funding"
-                ? "bg-teal-400 text-black"
+                ? "button text-black"
                 : "bg-gray-800 text-white"
             }`}
           >
@@ -113,7 +110,7 @@ function HistoryList() {
             onClick={() => setActiveTab("generic")}
             className={`px-4 py-2 rounded-t-lg font-medium ${
               activeTab === "generic"
-                ? "bg-teal-400 text-black"
+                ? "button text-black"
                 : "bg-gray-800 text-white"
             }`}
           >
@@ -122,7 +119,7 @@ function HistoryList() {
         </div>
 
         {/* Proposals Container */}
-        <div className="bg-gray-800 bg-opacity-50 rounded-b-lg p-4">
+        <div className="bg-gray-800 bg-opacity-50 rounded-b-lg p-1">
           {filteredProposals.length === 0 ? (
             <p className="text-white">No proposals found.</p>
           ) : (
@@ -139,8 +136,8 @@ function HistoryList() {
                   <h3 className="text-xl font-semibold mb-2">
                     Proposal {proposal.id}: {proposal.title}
                   </h3>
-                  <p className="mb-2">
-                    <strong>Description:</strong> {proposal.description}
+                  <p className="mb-4 mt-5 w-full border border-teal-300 p-4 rounded-lg bg-slate-950">
+                    <strong>Description</strong> <br /> {proposal.description}
                   </p>
 
                   {/* Human-readable timestamp */}

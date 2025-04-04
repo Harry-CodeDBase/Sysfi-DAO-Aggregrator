@@ -2,16 +2,11 @@ import React, { useEffect } from "react";
 import "./App.css";
 import SignIn from "./auth/Login";
 import Register from "./auth/Register";
-import Dashboard from "./pages/Dashboard";
+
 import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "./hooks/Context";
+
 import Loader from "./utils/Loader";
 import Sidebar from "./components/header/Sidebar";
-import TweetSubmissionComponent from "./pages/TweetSubmission";
-import CampaignIndex from "./pages/campaign/Index";
-import CampaignDetail from "./pages/campaign/CampaignDetails";
-import CampaignCreation from "./pages/campaign/CreateCampaign"; // Admin-only route
-import AdminCampaignVerification from "./pages/campaign/AdminCampaignVerification"; // Admin-only route
 import Header from "./components/header/Header";
 import BottomNav from "./components/header/ButtomNavbar";
 import "@rainbow-me/rainbowkit/styles.css";
@@ -36,46 +31,40 @@ import DAOFactoryComponent from "./pages/dao/DAOFactory";
 import DAO from "./pages/dao/DAO";
 import LaunchTokenForm from "./pages/memepad/CreateToken";
 import Index from "./pages/memepad/Index";
+import Factory from "./pages/FactoryGrid";
+import MemeTokenDashboard from "./pages/memepad/CreateToken";
+import CrowdsaleCreator from "./pages/memepad/CreateCrowdSale";
+import ScrollToTop from "./utils/ScrollToTop";
+import AirdropComponent from "./pages/airdrop";
+import DAODetails from "./pages/dac/DAODetails";
+import DAC from "./pages/dac/Index";
+import CrowdsaleCard from "./components/ui/CrowdSaleCrad1";
 
 const ALCHEMY_API_KEY = "SvIcMuv58RZnjEr4p5bXrN2_fnMa0rWc";
 
 const config = getDefaultConfig({
-  appName: "My RainbowKit App",
-  projectId: "b95028c13ca98a427d648e057629da40", //"c83e27a5b8fb63c08218f51b97103b95",
+  appName: "sysfi DAO",
+  projectId: "e67781b1f1a9105b7a8cc74d1f5d95fa", //"c83e27a5b8fb63c08218f51b97103b95",
   chains: [polygon, polygonAmoy],
   ssr: true, // If your dApp uses server side rendering (SSR)
   autoConnect: true, // autoconnect
-  // transports: {
-  //   [polygon.id]: http(
-  //     `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-  //   ),
-  //   [polygonAmoy.id]: http(
-  //     `https://polygon-amoy.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-  //   ),
-  // },
+  transports: {
+    [polygon.id]: http(
+      `https://polygon-mainnet.g.alchemy.com/v2/SvIcMuv58RZnjEr4p5bXrN2_fnMa0rWc`
+    ),
+    [polygonAmoy.id]: http(
+      `https://polygon-amoy.g.alchemy.com/v2/SvIcMuv58RZnjEr4p5bXrN2_fnMa0rWc`
+    ),
+  },
 });
 
 const queryClient = new QueryClient();
-
-const ADMIN_EMAIL = "harryfrancis037@gmail.com"; // Define admin email
-
-// AdminRoute Wrapper
-function AdminRoute({ element }) {
-  const { currentUser } = useAuth();
-
-  if (currentUser?.email !== ADMIN_EMAIL) {
-    return <Navigate to="/" replace />;
-  }
-
-  return element;
-}
 
 // Component for handling unauthenticated routes
 function UnauthenticatedRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Register />} />
-      <Route path="/login" element={<SignIn />} />
       <Route path="*" element={<Register />} />
     </Routes>
   );
@@ -84,33 +73,27 @@ function UnauthenticatedRoutes() {
 // Component for handling authenticated routes
 function AuthenticatedRoutes() {
   return (
-    <div className="bg-gray-900 pb-10">
-      {/* <div className="bg-gradient-to-br from-purple-800 via-teal-500 to-indigo-800"></div> */}
-      <Header />
+    // <div className="bg-gray-900 pb-10">
+    <div>
+      <ScrollToTop />
       <Sidebar />
-      <div className="w-full min-h-[80vh] scroll-auto lg:w-[81%] m-auto lg:ml-[19%]">
+      <div className="w-full min-h-[80vh] scroll-auto lg:w-[81%] m-auto lg:ml-[19%] mb-5">
+        <Header />
         <Routes>
           {/* User Routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/campaign" element={<CampaignIndex />} />
-          <Route path="/campaign/:campaignId" element={<CampaignDetail />} />
-          <Route exact path="/" element={<StakingComponent />} />
-          <Route path="/factory/DAO" element={<DAOFactoryComponent />} />
-          <Route path="/dao" element={<DAO />} />
-          <Route path="/memepad" element={<Index/>} />
-          
-
-          {/* Admin-Only Routes */}
+          <Route path="/stake" element={<StakingComponent />} />
+          <Route path="/factory" element={<Factory />} />
+          <Route path="/factory/subdao" element={<DAOFactoryComponent />} />
+          <Route path="/factory/memecoins" element={<MemeTokenDashboard />} />
+          <Route path="/factory/crowdsale" element={<CrowdsaleCreator />} />
+          <Route path="/launchpad" element={<Index />} />
           <Route
-            path="/admin/campaign/create"
-            element={<AdminRoute element={<CampaignCreation />} />}
+            path="/launchpad/:contractAddress"
+            element={<CrowdsaleCard />}
           />
-          <Route
-            path="/admin/campaign/verify"
-            element={<AdminRoute element={<AdminCampaignVerification />} />}
-          />
-
-          <Route path="*" element={<TweetSubmissionComponent />} />
+          <Route path="/dao/:daoAddress" element={<DAODetails />} />{" "}
+          <Route exact path="/" element={<DAC />} /> {/* Admin-Only Routes */}
+          <Route path="*" element={<DAC />} />
         </Routes>
         <BottomNav />
       </div>
@@ -119,21 +102,9 @@ function AuthenticatedRoutes() {
 }
 
 function AppRouter() {
-  const { currentUser, loading } = useAuth(); // Access current user and loading state
   const { isConnected } = useAccount();
-  const { connect } = useConnect();
 
-  useEffect(() => {
-    if (!isConnected) {
-      connect(); // 🔥 Automatically reconnect the wallet
-    }
-  }, [isConnected, connect]);
-
-  if (loading) {
-    return <Loader />; // Show loader while checking auth state
-  }
-
-  return isConnected ? <AuthenticatedRoutes /> : <UnauthenticatedRoutes />;
+  return !isConnected ? <UnauthenticatedRoutes /> : <AuthenticatedRoutes />;
 }
 
 function App() {
@@ -150,11 +121,9 @@ function App() {
             overlayBlur: "small",
           })}
         >
-          <AuthProvider>
-            <HashRouter>
-              <AppRouter />
-            </HashRouter>
-          </AuthProvider>
+          <HashRouter>
+            <AppRouter />
+          </HashRouter>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

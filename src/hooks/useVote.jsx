@@ -11,16 +11,13 @@ export function useVote() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  console.log("useVote Hook Initialized");
-  console.log("DAO Contract Address:", DAO_CONTRACT_ADDRESS);
-  console.log("DAO ABI:", DAO_ABI);
 
   const { writeContractAsync } = useWriteContract();
 
   const upVote = async (proposalId) => {
     try {
       setIsLoading(true);
-      console.log("Attempting to upvote proposal ID:", proposalId);
+   
 
       const result = await writeContractAsync({
         address: DAO_CONTRACT_ADDRESS,
@@ -30,7 +27,7 @@ export function useVote() {
         account: address,
       });
 
-      console.log("Upvote transaction result:", result);
+
     } catch (err) {
       console.error("Upvote error:", err);
       setError(err);
@@ -42,7 +39,7 @@ export function useVote() {
   const downVote = async (proposalId) => {
     try {
       setIsLoading(true);
-      console.log("Attempting to downvote proposal ID:", proposalId);
+  
 
       const result = await writeContractAsync({
         address: DAO_CONTRACT_ADDRESS,
@@ -52,7 +49,7 @@ export function useVote() {
         account: address,
       });
 
-      console.log("Downvote transaction result:", result);
+     
     } catch (err) {
       console.error("Downvote error:", err);
       setError(err);

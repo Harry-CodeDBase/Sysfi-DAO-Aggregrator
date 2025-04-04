@@ -38,12 +38,13 @@ export function useStaking() {
     functionName: "getNumberOfHolders",
   });
 
-  // **New: Read token allowance for the staking contract**
+  // **Updated: Read token allowance for the staking contract with watch enabled**
   const { data: allowance } = useReadContract({
     ...tokenContractConfig,
     functionName: "allowance",
     args: address ? [address, stakingContractConfig.address] : [],
     enabled: !!address,
+    watch: true, // This ensures the value is updated when the contract state changes
   });
   // If the allowance is greater than 0, consider it approved.
   const isApproved = allowance && allowance > 0n;
@@ -83,37 +84,49 @@ export function useStaking() {
    * Stake tokens by depositing them into the staking contract.
    * (This should only be callable once approval is done.)
    */
- const stake = () => {
-   if (!amount) return;
+  const stake = async () => {
+    if (!isConnected || !address) {
+      console.error("Wallet is not connected.");
+      return;
+    }
 
-   setProcessing(true);
-   console.log("Starting staking (deposit)...");
+    if (!allowance || allowance < parseUnits(amount, 18)) {
+      console.error("Not enough token allowance. Please approve first.");
+      return;
+    }
 
-   writeContractAsync({
-     ...stakingContractConfig,
-     functionName: "deposit",
-     args: [parseUnits(amount, 18)],
-     account: address,
-   })
-     .then((txResponse) => {
-       if (!txResponse || !txResponse.hash) {
-         throw new Error("Transaction failed or was rejected.");
-       }
-       console.log("Stake transaction sent:", txResponse.hash);
-       return waitForTransactionReceipt({ hash: txResponse.hash });
-     })
-     .then(() => {
-       console.log("Staking confirmed!");
-     })
-     .catch((error) => {
-       console.error("Stake transaction failed:", error);
-     })
-     .finally(() => {
-       setProcessing(false);
-     });
- };
+    if (!amount || parseFloat(amount) <= 0) {
+      console.error("Invalid staking amount.");
+      return;
+    }
 
+    try {
+      setProcessing(true);
+      console.log("Starting staking (deposit)...");
 
+      const parsedAmount = parseUnits(amount, 18);
+
+      const txResponse = await writeContractAsync({
+        ...stakingContractConfig,
+        functionName: "deposit",
+        args: [parsedAmount],
+        account: address,
+      });
+
+      if (!txResponse || !txResponse.hash) {
+        throw new Error("Transaction failed or was rejected.");
+      }
+
+      console.log("Stake transaction sent:", txResponse.hash);
+
+      await waitForTransactionReceipt({ hash: txResponse.hash });
+      console.log("Staking confirmed!");
+    } catch (error) {
+      console.error("Stake transaction failed:", error);
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   const withdraw = async () => {
     if (!amount) return;

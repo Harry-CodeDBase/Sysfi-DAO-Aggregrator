@@ -2,21 +2,24 @@ import React, { useState } from "react";
 import { useDAOFactory } from "../../hooks/useDAOFactory";
 import { formatUnits } from "viem"; // Ensure this is the correct function for your setup
 import daoImage from "../../img/loader.png"; // Replace with your actual image path
+import makeBlockie from "ethereum-blockies-base64";
+import { useNavigate } from "react-router-dom";
+import BackButton from "../../utils/BackButton";
 
 function DAOFactoryComponent() {
+  const navigate = useNavigate();
   // Local form state.
   const [daoName, setDaoName] = useState("");
   const [quorum, setQuorum] = useState("");
   const [votingPeriodDays, setVotingPeriodDays] = useState(""); // User enters days
   // DAO type: "eth" for ETH DAO, "token" for token-based DAO.
-  const [daoType, setDaoType] = useState("eth");
+  const [daoType, setDaoType] = useState("token");
   const [tokenAddress, setTokenAddress] = useState("");
   // Genre stored as a string corresponding to the enum index.
   const [genre, setGenre] = useState("3"); // Default "DEFI" (index 3)
 
   const {
     isConnected,
-    nativeFee,
     tokenFee,
     deployedDAOs,
     createDAO,
@@ -58,16 +61,18 @@ function DAOFactoryComponent() {
 
   if (!isDataReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <img src={daoImage} alt="Loading..." className="w-20 h-20" />
-        <p className="text-white ml-4">Initializing DAO Factory...</p>
+      <div>
+        <div className="min-h-screen flex items-center justify-center">
+          <img src={daoImage} alt="Loading..." className="w-20 h-20" />
+          <p className="text-white ml-4">Initializing DAO Factory...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-start justify-center bg-gray-900 p-4">
-      <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8">
+    <div className="min-h-screen flex items-start justify-center  p-2">
+      <div className="w-full max-w-6xl flex flex-col-reverse md:flex-row gap-8">
         {/* Left Column: Deployed DAOs List */}
         <div className="w-full md:w-1/2">
           <div className="bg-black bg-opacity-50 backdrop-blur-lg rounded-xl shadow-xl p-6">
@@ -78,42 +83,41 @@ function DAOFactoryComponent() {
               deployedDAOs.map((dao, index) => (
                 <div
                   key={index}
-                  className="p-4 mb-4 bg-gray-800 bg-opacity-75 rounded-lg"
+                  className="p-4 mb-4 bg-gray-800 bg-opacity-75 rounded-lg flex items-center cursor-pointer hover:bg-gray-700 transition"
+                  onClick={() =>
+                    navigate(
+                      `/dao/${dao.daoAddress}?name=${encodeURIComponent(
+                        dao.daoName
+                      )}&genre=${dao.genre}`
+                    )
+                  }
                 >
-                  <p className="text-white text-sm">
-                    <span className="font-semibold">DAO Address:</span>{" "}
-                    {dao.daoAddress}
-                  </p>
-                  <p className="text-white text-sm">
-                    <span className="font-semibold">Genre:</span>{" "}
-                    {(() => {
-                      switch (dao.genre) {
-                        case "0":
-                        case 0:
-                          return "NFT";
-                        case "1":
-                        case 1:
-                          return "GAMING";
-                        case "2":
-                        case 2:
-                          return "COMMUNITY";
-                        case "3":
-                        case 3:
-                          return "DEFI";
-                        case "4":
-                        case 4:
-                          return "AI";
-                        case "5":
-                        case 5:
-                          return "DEGEN";
-                        case "6":
-                        case 6:
-                          return "MEMECOIN";
-                        default:
-                          return "Unknown";
-                      }
-                    })()}
-                  </p>
+                  <img
+                    src={makeBlockie(dao.daoAddress)}
+                    alt="DAO Blockie"
+                    className="w-10 h-10 rounded-full mr-4"
+                  />
+                  <div>
+                    <p className="text-white text-sm font-semibold">
+                      {dao.daoName}
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      {" "}
+                      {dao.daoAddress.slice(0, 6)}...{dao.daoAddress.slice(-6)}
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      Genre:{" "}
+                      {[
+                        "NFT",
+                        "GAMING",
+                        "COMMUNITY",
+                        "DEFI",
+                        "AI",
+                        "DEGEN",
+                        "MEMECOIN",
+                      ][dao.genre] || "Unknown"}
+                    </p>
+                  </div>
                 </div>
               ))
             ) : (
@@ -143,11 +147,12 @@ function DAOFactoryComponent() {
               <div className="flex justify-center mt-2">
                 {daoType === "eth" ? (
                   <div className="text-white text-center">
-                    <p className="text-xs">ETH DAO Fee</p>
+                    <p className="text-xs">POL DAO Fee</p>
                     <p className="font-semibold">
                       {nativeFee
                         ? formatUnits(nativeFee.toString(), 18)
-                        : "Loading..."}
+                        : "Loading..."}{" "}
+                      POL
                     </p>
                   </div>
                 ) : (
@@ -156,7 +161,8 @@ function DAOFactoryComponent() {
                     <p className="font-semibold">
                       {tokenFee
                         ? formatUnits(tokenFee.toString(), 18)
-                        : "Loading..."}
+                        : "Loading..."}{" "}
+                      wSYN
                     </p>
                   </div>
                 )}
@@ -218,8 +224,8 @@ function DAOFactoryComponent() {
                       onChange={(e) => setDaoType(e.target.value)}
                       className="w-full p-2 rounded-lg bg-gray-700 text-white focus:outline-none"
                     >
-                      <option value="eth">ETH DAO</option>
-                      <option value="token">Token DAO</option>
+                      {/* <option value="eth">POL Based DAO</option> */}
+                      <option value="token">Token Based DAO</option>
                     </select>
                   </div>
                   {daoType === "token" && (
