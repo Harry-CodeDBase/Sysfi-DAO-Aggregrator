@@ -40,21 +40,16 @@ import DAODetails from "./pages/dac/DAODetails";
 import DAC from "./pages/dac/Index";
 import CrowdsaleCard from "./components/ui/CrowdSaleCrad1";
 
-const ALCHEMY_API_KEY = "SvIcMuv58RZnjEr4p5bXrN2_fnMa0rWc";
+const ALCHEMY_API_KEY = "";
 
 const config = getDefaultConfig({
   appName: "sysfi DAO",
-  projectId: "e67781b1f1a9105b7a8cc74d1f5d95fa", //"c83e27a5b8fb63c08218f51b97103b95",
+  projectId: "",
   chains: [polygon, polygonAmoy],
   ssr: true, // If your dApp uses server side rendering (SSR)
   autoConnect: true, // autoconnect
   transports: {
-    [polygon.id]: http(
-      `https://polygon-mainnet.g.alchemy.com/v2/SvIcMuv58RZnjEr4p5bXrN2_fnMa0rWc`
-    ),
-    [polygonAmoy.id]: http(
-      `https://polygon-amoy.g.alchemy.com/v2/SvIcMuv58RZnjEr4p5bXrN2_fnMa0rWc`
-    ),
+  
   },
 });
 
